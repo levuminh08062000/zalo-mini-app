@@ -1,23 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
 
+import './App.css';
+import React, { useState } from 'react';
 function App() {
+  const [location, setLocation] = useState(null);
+  const [error, setError] = useState('');
+
+  const getLocation = () => {
+    if (!window.zalo) {
+      setError('Zalo SDK chưa sẵn sàng (chỉ hoạt động trong Zalo App)');
+      return;
+    }
+
+    window.zalo.getLocation({
+      success: (res) => {
+        setLocation(res);
+        setError('');
+      },
+      fail: (err) => {
+        setError('Không thể lấy vị trí: ' + JSON.stringify(err));
+      }
+    });
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <div style={{ padding: 20 }}>
+      <h1>Zalo Mini App - React (CRA)</h1>
+      <button onClick={getLocation}>Lấy vị trí</button>
+      {location && (
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          📍 Lat: {location.latitude}, Lng: {location.longitude}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      )}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }
