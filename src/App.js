@@ -1,36 +1,35 @@
+import React, { useState, useRef } from 'react';
 
-import './App.css';
-import React, { useState } from 'react';
 function App() {
-  const [location, setLocation] = useState(null);
-  const [error, setError] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const fileInputRef = useRef(null); // dùng để click input ẩn
 
-  const getLocation = () => {
-    if (!window.zalo) {
-      setError('Zalo SDK chưa sẵn sàng (chỉ hoạt động trong Zalo App)');
-      return;
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setImageUrl(url);
     }
-
-    window.zalo.getLocation({
-      success: (res) => {
-        setLocation(res);
-        setError('');
-      },
-      fail: (err) => {
-        setError('Không thể lấy vị trí: ' + JSON.stringify(err));
-      }
-    });
   };
+
+  const handleTakePhotoClick = () => {
+    fileInputRef.current.click(); // mô phỏng click input ẩn
+  };
+
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Zalo Mini App - React (CRA)</h1>
-      <button onClick={getLocation}>Lấy vị trí</button>
-      {location && (
-        <p>
-          📍 Lat: {location.latitude}, Lng: {location.longitude}
-        </p>
-      )}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div>
+      <button onClick={handleTakePhotoClick}>📷 Chụp ảnh</button>
+
+      <input
+        type="file"
+        accept="image/*"
+        capture="user"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+
+      {imageUrl && <img src={imageUrl} alt="Ảnh đã chụp" width="200" />}
     </div>
   );
 }
